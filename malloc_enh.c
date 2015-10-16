@@ -168,12 +168,12 @@ int main()
 	char *b= (char *)malloc(10*sizeof(char));
 	printf("%d b before\n", b);
 	//printf("%d", __LINE__);
-	//b="abcdef";
-	/*int g = 0;
-	for(g=0; g<10; g++)
-		b[g]='a'
-	*/
-	printf("%s %d\n", b, b);
+	*b='a';
+	//int g = 0;
+	//for(g=0; g<10; g++)
+	//	b[g]='a'
+	printf("%d \n", __LINE__);
+	printf("%c %d\n",*b, b);
 	
 	free(b);
 					//I managed to fix it by not adding any values to B. By adding values to B it for some reason changed the address completely.
