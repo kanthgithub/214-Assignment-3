@@ -1,1 +1,3 @@
 If our Big Block becomes full, print out a message and return a null pointer.
+For fragmentation, we do not need to fragment the memory ourselves. All we need to do is that atexit, go through the memory blocks and inform the user that they did not free the malloc at XYZ file and XYZ line.
+Each mementry struct contains the line number and the file number too.
