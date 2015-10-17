@@ -134,13 +134,13 @@ void myFree(void * p1, char * file, int line)
 	
 	if(ptr->recognize!=recpattern)
 	{
-		printf("ERROR: NOT ALLOCATED\n");
+		printf("\x1B[2;31m ERROR: %s Line %d NOT ALLOCATED FROM MALLOC\n \x1B[0m", file, line);
 		return;
 	}
 
 	if(ptr->isfree)
 	{
-		printf("ERROR: ALREADY DEALLOCATED\n");
+		printf("\x1B[2;31m ERROR: %s Line %d ALREADY DEALLOCATED\n \x1B[0m",file,line);
 		return;
 	}
 
@@ -169,6 +169,7 @@ void myFree(void * p1, char * file, int line)
 		if(succ->succ!=NULL)
 			succ->succ = pred;
 	}
+	printf("Free was successful.\n");
 }
 
 int main()
@@ -179,6 +180,7 @@ int main()
 	int i = 0;
 	for(i=0; i<10; i++)
 		arr[i]=i+1;
+	printf("Allocated an array of 10 integers to arr.\n");
 	// i=0;
 	// while(i<10){
 	// printf("%d\n", arr[i]);
@@ -188,14 +190,21 @@ int main()
 	char *b= (char *)malloc(10*sizeof(char));
 	printf("Malloc for b gave me the address %d\n", b);
 	int g = 0;
-	for(g=0; g<10; g++)
+	for(g=0; g<9; g++)
 		b[g]='r';
-
+	b[9]='\0';
 	printf("b stores %s in address %d\n",b, b);
-	free(arr);
-	b=(char*)malloc(10*sizeof(char));
+	
+	//Freeing b+10, which wasnt an address by our malloc SHOULD GIVE AN ERROR
+	free(b+10);
+	
+	//Freeing b normally, should be successful.
 	free(b);
 
+	//Freeing b again; SHOULD GIVE AN ERROR
+	free(b);
+
+	//TRYING TO FREE SOMETHING NOT ALLOCATED BY MALLOC
 	int x;
 	free(&x);
 		
