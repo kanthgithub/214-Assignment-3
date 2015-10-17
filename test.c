@@ -2,18 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define malloc(x)	myMalloc( x, __FILE__, __LINE__)
-#define free(x)		myFree(x, __FILE__, __LINE__)
+#define malloc(x)	myMalloc(x, __FILE__, __LINE__)
+#define free(x)		myFree((void*)x, __FILE__, __LINE__)
 
 # define blocksize 1<<20
 # define fudge_factor 5
-# define recpattern -1
+# define recpattern 0xAAAAAAAA
 //Mementry structure- INCLUDE IN HEADER FILE
 
 typedef struct mementry
 {
-	int recognize;
 	struct mementry *prev, *succ;
+	int recognize;
 	int isfree;
 	unsigned int size;
 } mementry;
@@ -40,11 +40,11 @@ void *myMalloc(unsigned int size, char * file, int line)
 		root=(mementry*)big_block;
 		root->prev=NULL;
 		root->succ=NULL;
+		root->recognize=recpattern;
 		root->size=(blocksize)-sizeof(mementry);
 		root->isfree=1;
 		initialized=1;
-
-		root->recognize=recpattern;
+		printf("Dynamic memory slot initialized with root at %d \n", root);
 	}
 	
 	p=root;
@@ -73,14 +73,18 @@ void *myMalloc(unsigned int size, char * file, int line)
 			p->prev=prev;
 			
 			p->recognize=recpattern;
-
+			printf("Memory allocated to existing mementry. Location of mementry is %d\n", p);
+			printf("Size of mementry is actually %d while size requested was %d \n",p->size, size );
+			printf("p has a prev as %d and successor as %d \n",p->prev, p->succ );
+			printf("p isfree is %d and p recognize is %x \n",p->isfree, p->recognize );
+			printf("\n\n");
 			return (char*)p + sizeof(mementry);
 			//return p + sizeof(mementry);
 		}
 		else
 		{
 			printf("%d\n", __LINE__);
-			succ=(mementry *)((char *)p + sizeof(mementry) + size); // NOT CORRECT??? IN RECITATION PEOPLE SUGGESTED TO PUT size IN PARENTHESIS!
+			succ=(mementry *)((char *)p + sizeof(mementry) + size);
 			succ->prev=p;
 			succ->succ=p->succ;
 			if(p->succ!=NULL)
@@ -103,7 +107,13 @@ void *myMalloc(unsigned int size, char * file, int line)
 			//printf("%d root isfree\n", root->isfree);
 			//printf("%d\n __LINE__", p->prev->isfree); //thisbreaksus
 
-			return (char*)(p + sizeof(mementry));
+			printf("Memory allocated, new mementry created. Location of mementry is %d\n", p);
+			printf("Size of mementry is actually %d while size requested was %d \n",p->size, size );
+			printf("p has a prev as %d and successor as %d \n",p->prev, p->succ );
+			printf("p isfree is %d and p recognize is %x \n",p->isfree, p->recognize );
+			printf("\n\n");
+			
+			return (char*)p + sizeof(mementry);
 			//return p + sizeof(mementry);
 		}
 	}
@@ -114,13 +124,15 @@ void *myMalloc(unsigned int size, char * file, int line)
 void myFree(void * p1, char * file, int line)
 {
 	mementry *ptr, *pred, *succ;
-	//ptr = (mementry *)(p1-1);
-	ptr = (mementry *)(p1+sizeof(mementry)); 
+	ptr = (mementry *)p1-1;
+	//ptr = (mementry *)((char*)p1-sizeof(mementry)); 
 	
-	printf("ptr %d recognize %d\n", ptr, ptr->recognize);	
+	printf("ptr %d isfree is %d \n", ptr, ptr->isfree);	
+	printf("ptr %d size %d \n", ptr, ptr->size);	
+	printf("ptr %d recognize %x \n", ptr, ptr->recognize);	
 	
 	
-	if(ptr->recognize==recpattern)
+	if(ptr->recognize!=recpattern)
 	{
 		printf("ERROR: NOT ALLOCATED\n");
 		return;
@@ -157,33 +169,30 @@ void myFree(void * p1, char * file, int line)
 		if(succ->succ!=NULL)
 			succ->succ = pred;
 	}
-
-	// I DONT KNOW IF THIS IS COMPLETE? ThIS IS THE LAST THING HE WROTE IN CLASS
 }
 
 int main()
 {
+	printf("Size of mementry is %d \n", sizeof(mementry));
 	int *arr= (int *)malloc(10*sizeof(int));
-
-	arr[0]=1;
+	printf("Malloc for arr gave me the address %d \n",arr);
 	int i = 0;
 	for(i=0; i<10; i++)
 		arr[i]=i+1;
-	i=0;
-	while(i<10){
-	printf("%d\n", arr[i]);
-	i++;
-	}
+	// i=0;
+	// while(i<10){
+	// printf("%d\n", arr[i]);
+	// i++;
+	// }
 	
 	char *b= (char *)malloc(10*sizeof(char));
-	
+	printf("Malloc for b gave me the address %d\n", b);
 	int g = 0;
 	for(g=0; g<10; g++)
-		b[g]='a';
+		b[g]='r';
 
-	printf("%s %d\n",b, b);
-	
-	free(b);
+	printf("b stores %s in address %d\n",b, b);
+	free(arr);
 	b=(char*)malloc(10*sizeof(char));
 	free(b);
 
