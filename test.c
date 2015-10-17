@@ -19,7 +19,7 @@ typedef struct mementry
 } mementry;
 
 static char big_block[blocksize];
-
+static int memused=0;
 //static int initialized=0;
 
 void *myMalloc(unsigned int size, char * file, int line)
@@ -31,9 +31,15 @@ void *myMalloc(unsigned int size, char * file, int line)
 		return(0);
 	}
 
+	//static int memused=0;
 	static int initialized=0;
 	static mementry *root;
+
+	static mementry *largeroot;
+
 	mementry *p, *succ, *prev;
+
+	printf("MEMUSED SO FAR: %d MEMLEFT: %d\n", memused, ((blocksize)-24)-memused);
 
 	if(!initialized)
 	{
@@ -44,10 +50,25 @@ void *myMalloc(unsigned int size, char * file, int line)
 		root->size=(blocksize)-sizeof(mementry);
 		root->isfree=1;
 		initialized=1;
+	
+		//One of the suggested methods for dealing with fragmentation was having one portion of our array be for small blocks and the other for 
+		//large ones. Here, I made largeroot, a pointer to the latter half of our array, which is where we'll put large requests.
+		//Play around with it, right now we have 2 linked lists, one with root and one with largeroot. But we should probably connect them.	
+		largeroot=(mementry*)(&big_block[blocksize/2]);
+		largeroot->prev=NULL;
+		largeroot->succ=NULL;
+		largeroot->recognize=recpattern;
+		largeroot->size=(blocksize)-sizeof(mementry);
+		largeroot->isfree=1;
+		
 		printf("Dynamic memory slot initialized with root at %d \n", root);
 	}
-	
-	p=root;
+
+	if(size < 3000)
+		p=root;
+	else
+		p=largeroot;
+
 	prev=root;
 	//mementry*test=root;
 	//printf("%d is the address of root \n",root);
@@ -78,11 +99,19 @@ void *myMalloc(unsigned int size, char * file, int line)
 			printf("p has a prev as %d and successor as %d \n",p->prev, p->succ );
 			printf("p isfree is %d and p recognize is %x \n",p->isfree, p->recognize );
 			printf("\n\n");
+			memused=memused+size;
 			return (char*)p + sizeof(mementry);
 			//return p + sizeof(mementry);
 		}
 		else
 		{
+			if(memused+size>((blocksize)-24))
+			{
+				printf("\x1B[2;31m ERROR: SATURATION, NO ROOM FOR REQUESTED CHUNK. FILE %s LINE %d\n \x1B[0m", file, line);
+				return NULL;
+			}
+			memused=memused+size;
+
 			printf("%d\n", __LINE__);
 			succ=(mementry *)((char *)p + sizeof(mementry) + size);
 			succ->prev=p;
@@ -118,7 +147,7 @@ void *myMalloc(unsigned int size, char * file, int line)
 		}
 	}
 
-	printf("ERROR: USED ALL MEMORY");	
+	printf("\x1B[2;31m ERROR: SATURATION, NO ROOM FOR REQUESTED CHUNK. CALL SPECIFICS: FILE: %s, LINE: %d\n \x1B[0m", file, line);	
 	return 0;
 }
 void myFree(void * p1, char * file, int line)
@@ -144,6 +173,8 @@ void myFree(void * p1, char * file, int line)
 		return;
 	}
 
+	memused=memused-(ptr->size);	
+	printf("MEMLEFT AFTER FREEING: %d\n", (((blocksize)-24)-memused));
 
 	if(((pred=ptr->prev)!=NULL) && pred->isfree)
 	{
@@ -194,6 +225,10 @@ int main()
 		b[g]='r';
 	b[9]='\0';
 	printf("b stores %s in address %d\n",b, b);
+
+	printf("in main, after all mallocs:MEMUSED: %d MEMLEFT: %d\n", memused, ((blocksize)-24)-memused);
+	
+	char *c= (char *)malloc((((blocksize)-24)));
 	
 	//Freeing b+10, which wasnt an address by our malloc SHOULD GIVE AN ERROR
 	free(b+10);
@@ -207,6 +242,7 @@ int main()
 	//TRYING TO FREE SOMETHING NOT ALLOCATED BY MALLOC
 	int x;
 	free(&x);
-		
+	
 	return(0);
 }
+
