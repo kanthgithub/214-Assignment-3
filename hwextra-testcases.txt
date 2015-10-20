@@ -38,70 +38,70 @@ INPUT:
 	free(&x);
 
 OUTPUT:
-MEMUSED SO FAR: 0 MEMLEFT: 1048552
-Dynamic memory slot initialized with root at 6297856
+MEMUSED SO FAR: 0 MEMLEFT: 1048544
+Dynamic memory slot initialized with root at 6297824
 144150
-Memory allocated, new mementry created. Location of mementry is 6297856
+Memory allocated, new mementry created. Location of mementry is 6297824
 Size of mementry is actually 40 while size requested was 40
-p has a prev as 6297856 and successor as 6297928
+p has a prev as 6297824 and successor as 6297896
 p isfree is 0 and p recognize is aaaaaaaa
 
 
-Malloc for arr gave me the address 6297888
+Malloc for arr gave me the address 6297856
 Allocated an array of 10 integers to arr.
-MEMUSED SO FAR: 40 MEMLEFT: 1048512
+MEMUSED SO FAR: 40 MEMLEFT: 1048504
 144150
-Memory allocated, new mementry created. Location of mementry is 6297928
+Memory allocated, new mementry created. Location of mementry is 6297896
 Size of mementry is actually 10 while size requested was 10
-p has a prev as 6297856 and successor as 6297970
+p has a prev as 6297824 and successor as 6297938
 p isfree is 0 and p recognize is aaaaaaaa
 
 
-Malloc for b gave me the address 6297960
-b stores rrrrrrrrr in address 6297960
-in main, after all mallocs:MEMUSED: 50 MEMLEFT: 1048502
-MEMUSED SO FAR: 50 MEMLEFT: 1048502
+Malloc for b gave me the address 6297928
+b stores rrrrrrrrr in address 6297928
+in main, after all mallocs:MEMUSED: 50 MEMLEFT: 1048494
+MEMUSED SO FAR: 50 MEMLEFT: 1048494
 55 in last==NULL
-last is at: 6789120
- last-prev is: 6297970
+last is at: 6789088
+ last-prev is: 6297938
  last-size is: 1000
  p-size 1048430
- p-succ 6789120
- p 6297970
-MEMUSED SO FAR: 50 MEMLEFT: 1048502
+ p-succ 6789088
+ p 6297938
+MEMUSED SO FAR: 50 MEMLEFT: 1048494
 144174
-succ 7314400, succ->size 1000, succ-prev 6297970, succ-succ 6789120
-, p 6297970, p-succ 7314400
-Memory allocated, new mementry created. Location of mementry is 6297970
+succ 7314368, succ->size 1000, succ-prev 6297938, succ-succ 6789088
+, p 6297938, p-succ 7314368
+Memory allocated, new mementry created. Location of mementry is 6297938
 Size of mementry is actually 1047398 while size requested was 1000
-p has a prev as 6789120 and successor as 7314400
+p has a prev as 6789088 and successor as 7314368
 p isfree is 1 and p recognize is 0
 
 
 IN FREE
-ptr 6297938 isfree is 1920073728
-ptr 6297938 size 1920103026
-ptr 6297938 recognize 0
+ptr 6297906 isfree is 1920073728
+ptr 6297906 size 1920103026
+ptr 6297906 recognize 0
  ERROR: implementation.c Line 297 NOT ALLOCATED FROM MALLOC
  IN FREE
-ptr 6297928 isfree is 0
-ptr 6297928 size 10
-ptr 6297928 recognize aaaaaaaa
-MEMLEFT AFTER FREEING: 1047512
+ptr 6297896 isfree is 0
+ptr 6297896 size 10
+ptr 6297896 recognize aaaaaaaa
+MEMLEFT AFTER FREEING: 1047504
 Free was successful.
 IN FREE
-ptr 6297928 isfree is 1
-ptr 6297928 size 1047440
-ptr 6297928 recognize aaaaaaaa
+ptr 6297896 isfree is 1
+ptr 6297896 size 1047440
+ptr 6297896 recognize aaaaaaaa
  ERROR: implementation.c Line 303 ALREADY DEALLOCATED
  IN FREE
-ptr 7314400 isfree is 0
-ptr 7314400 size 1000
-ptr 7314400 recognize aaaaaaaa
-MEMLEFT AFTER FREEING: 1048512
+ptr 7314368 isfree is 0
+ptr 7314368 size 1000
+ptr 7314368 recognize aaaaaaaa
+MEMLEFT AFTER FREEING: 1048504
 Free was successful.
 IN FREE
-ptr -835693460 isfree is -835693128
-ptr -835693460 size 32767
-ptr -835693460 recognize 0
+ptr 1941897916 isfree is 1941898248
+ptr 1941897916 size 32767
+ptr 1941897916 recognize 0
  ERROR: implementation.c Line 310 NOT ALLOCATED FROM MALLOC

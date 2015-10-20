@@ -5,7 +5,7 @@ static int memused=0;
 
 void *myMalloc(unsigned int size, char * file, int line)
 {
-	if(size>((blocksize)-24))
+	if(size>((blocksize)-sizeof(mementry)))
 	{
 		printf("TOO LARGE CHUNK REQUESTED\n");
 		printf("Call specifics: FILE %s LINE %d\n", file, line);
@@ -24,7 +24,7 @@ void *myMalloc(unsigned int size, char * file, int line)
 
 	mementry *p, *succ, *prev;
 
-	printf("MEMUSED SO FAR: %d MEMLEFT: %d\n", memused, ((blocksize)-24)-memused);
+	printf("MEMUSED SO FAR: %d MEMLEFT: %d\n", memused, ((blocksize)-sizeof(mementry))-memused);
 
 	if(!initialized)
 	{
@@ -134,7 +134,7 @@ void *myMalloc(unsigned int size, char * file, int line)
 		else
 		{
 			//Saturation 
-			if(memused+size>((blocksize)-24))
+			if(memused+size>((blocksize)-sizeof(mementry)))
 			{
 				printf("\x1B[2;31m ERROR: SATURATION, NO ROOM FOR REQUESTED CHUNK. FILE %s LINE %d\n \x1B[0m", file, line);
 				return NULL;
@@ -241,7 +241,7 @@ void myFree(void * p1, char * file, int line)
 	}
 
 	memused=memused-(ptr->size);	
-	printf("MEMLEFT AFTER FREEING: %d\n", (((blocksize)-24)-memused));
+	printf("MEMLEFT AFTER FREEING: %d\n", (((blocksize)-sizeof(mementry))-memused));
 
 	if(((pred=ptr->prev)!=NULL) && pred->isfree)
 	{			
@@ -270,7 +270,7 @@ void myFree(void * p1, char * file, int line)
 int main()
 {
 
-	printf("Size of mementry is %d \n", sizeof(mementry));
+	//printf("Size of mementry is %d \n", sizeof(mementry));
 	int *arr= (int *)malloc(10*sizeof(int));
 	printf("Malloc for arr gave me the address %d \n",arr);
 	int i = 0;
@@ -287,7 +287,7 @@ int main()
 	b[9]='\0';
 	printf("b stores %s in address %d\n",b, b);
 
-	printf("in main, after all mallocs:MEMUSED: %d MEMLEFT: %d\n", memused, ((blocksize)-24)-memused);
+	printf("in main, after all mallocs:MEMUSED: %d MEMLEFT: %d\n", memused, ((blocksize)-sizeof(mementry))-memused);
 
 	//adding two "large" chunks. 	
 	char *c= (char *)malloc(1000);
