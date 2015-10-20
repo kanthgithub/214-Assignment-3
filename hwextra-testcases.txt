@@ -1,107 +1,75 @@
 INPUT:
 	int *arr= (int *)malloc(10*sizeof(int));
-	printf("Malloc for arr gave me the address %d \n",arr);
 	int i = 0;
 	for(i=0; i<10; i++)
 		arr[i]=i+1;
 	printf("Allocated an array of 10 integers to arr.\n");
-	
-
 	char *b= (char *)malloc(10*sizeof(char));
-	printf("Malloc for b gave me the address %d\n", b);
 	int g = 0;
 	for(g=0; g<9; g++)
 		b[g]='r';
 	b[9]='\0';
 	printf("b stores %s in address %d\n",b, b);
 
-	printf("in main, after all mallocs:MEMUSED: %d MEMLEFT: %d\n", memused, ((blocksize)-24)-memused);
+	printf("in main, after all mallocs:MEMUSED: %d MEMLEFT: %d\n", memused, ((blocksize)-sizeof(mementry))-memused);
 
-	//adding two "large" chunks. 	
+	printf("Adding two LARGE chunks now\n");
 	char *c= (char *)malloc(1000);
 	char *d= (char *)malloc(1000);
 	
-	//Freeing b+10, which wasnt an address by our malloc SHOULD GIVE AN ERROR
+	printf("Freeing b+10, which wasnt an address by our malloc SHOULD GIVE AN ERROR\n");
 	free(b+10);
 	
-	//Freeing b normally, should be successful.
+	printf("Freeing b normally, should be successful.\n");
 	free(b);
 
-	//Freeing b again; SHOULD GIVE AN ERROR
+	printf("Freeing b again; SHOULD GIVE AN ERROR\n");
 	free(b);
 
-	//Trying to free one of our LARGE CHUNKS
+	printf("Trying to free one of our LARGE CHUNKS\n");
 	free(d);
 
-	//TRYING TO FREE SOMETHING NOT ALLOCATED BY MALLOC
+	printf("TRYING TO FREE SOMETHING NOT ALLOCATED BY MALLOC\n");
 	int x;
 	free(&x);
 
 OUTPUT:
 MEMUSED SO FAR: 0 MEMLEFT: 1048544
-Dynamic memory slot initialized with root at 6297824
-144150
-Memory allocated, new mementry created. Location of mementry is 6297824
+Dynamic memory slot initialized with root at 6297408
+Memory allocated, new mementry created. Location of mementry is 6297408
 Size of mementry is actually 40 while size requested was 40
-p has a prev as 6297824 and successor as 6297896
+p has a prev as 6297408 and successor as 6297480
 p isfree is 0 and p recognize is aaaaaaaa
 
 
-Malloc for arr gave me the address 6297856
 Allocated an array of 10 integers to arr.
 MEMUSED SO FAR: 40 MEMLEFT: 1048504
-144150
-Memory allocated, new mementry created. Location of mementry is 6297896
+Memory allocated, new mementry created. Location of mementry is 6297480
 Size of mementry is actually 10 while size requested was 10
-p has a prev as 6297824 and successor as 6297938
+p has a prev as 6297408 and successor as 6297522
 p isfree is 0 and p recognize is aaaaaaaa
 
 
-Malloc for b gave me the address 6297928
-b stores rrrrrrrrr in address 6297928
+b stores rrrrrrrrr in address 6297512
 in main, after all mallocs:MEMUSED: 50 MEMLEFT: 1048494
+Adding two LARGE chunks now
 MEMUSED SO FAR: 50 MEMLEFT: 1048494
-55 in last==NULL
-last is at: 6789088
- last-prev is: 6297938
- last-size is: 1000
- p-size 1048430
- p-succ 6789088
- p 6297938
 MEMUSED SO FAR: 50 MEMLEFT: 1048494
-144174
-succ 7314368, succ->size 1000, succ-prev 6297938, succ-succ 6789088
-, p 6297938, p-succ 7314368
-Memory allocated, new mementry created. Location of mementry is 6297938
+Memory allocated, new mementry created. Location of mementry is 6297522
 Size of mementry is actually 1047398 while size requested was 1000
-p has a prev as 6789088 and successor as 7314368
+p has a prev as 6788672 and successor as 7313952
 p isfree is 1 and p recognize is 0
 
 
-IN FREE
-ptr 6297906 isfree is 1920073728
-ptr 6297906 size 1920103026
-ptr 6297906 recognize 0
- ERROR: implementation.c Line 297 NOT ALLOCATED FROM MALLOC
- IN FREE
-ptr 6297896 isfree is 0
-ptr 6297896 size 10
-ptr 6297896 recognize aaaaaaaa
+Freeing b+10, which wasnt an address by our malloc SHOULD GIVE AN ERROR
+ ERROR: implementation.c Line 264 NOT ALLOCATED FROM MALLOC
+ Freeing b normally, should be successful.
 MEMLEFT AFTER FREEING: 1047504
 Free was successful.
-IN FREE
-ptr 6297896 isfree is 1
-ptr 6297896 size 1047440
-ptr 6297896 recognize aaaaaaaa
- ERROR: implementation.c Line 303 ALREADY DEALLOCATED
- IN FREE
-ptr 7314368 isfree is 0
-ptr 7314368 size 1000
-ptr 7314368 recognize aaaaaaaa
+Freeing b again; SHOULD GIVE AN ERROR
+ ERROR: implementation.c Line 270 ALREADY DEALLOCATED
+ Trying to free one of our LARGE CHUNKS
 MEMLEFT AFTER FREEING: 1048504
 Free was successful.
-IN FREE
-ptr 1941897916 isfree is 1941898248
-ptr 1941897916 size 32767
-ptr 1941897916 recognize 0
- ERROR: implementation.c Line 310 NOT ALLOCATED FROM MALLOC
+TRYING TO FREE SOMETHING NOT ALLOCATED BY MALLOC
+ ERROR: implementation.c Line 277 NOT ALLOCATED FROM MALLOC

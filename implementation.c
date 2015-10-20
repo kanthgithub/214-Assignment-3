@@ -12,7 +12,6 @@ void *myMalloc(unsigned int size, char * file, int line)
 		return(0);
 	}
 
-	//static int memused=0;
 	static int initialized=0;
 	static mementry *root;
 	
@@ -52,7 +51,6 @@ void *myMalloc(unsigned int size, char * file, int line)
 		if(last==NULL)
 		{
 
-			printf("%d in last==NULL\n", __LINE__);
 			last=((mementry *)(&big_block[blocksize-1])-(sizeof(mementry)+size)); //placing last at the end of the array, with our first large chunk
 
 			//I need to traverse the old list, starting from root, so that I can properly "hook up" LAST.			
@@ -66,8 +64,6 @@ void *myMalloc(unsigned int size, char * file, int line)
 			last->isfree=0;
 			last->size=size;
 			last->recognize=recpattern;
-
-			printf("last is at: %d\n last-prev is: %d\n last-size is: %d\n p-size %d\n p-succ %d\n p %d\n", last, last->prev, last->size, p->size, p->succ, 				p);
 			return last;
 		}
 		else
@@ -90,8 +86,7 @@ void *myMalloc(unsigned int size, char * file, int line)
 		p=root;
 		prev=root;
 	}
-	//mementry*test=root;
-	//printf("%d is the address of root \n",root);
+	
 	while(p!=NULL)
 	{
 		if(p->size < size)
@@ -129,7 +124,6 @@ void *myMalloc(unsigned int size, char * file, int line)
 			printf("\n\n");
 			memused=memused+size;
 			return (char*)p + sizeof(mementry);
-			//return p + sizeof(mementry);
 		}
 		else
 		{
@@ -140,23 +134,17 @@ void *myMalloc(unsigned int size, char * file, int line)
 				return NULL;
 			}
 			memused=memused+size;
-			
-			printf("%d", __LINE__);	
-
 			//Here, we see lr again. It tells the program whether we're dealing with a large chunk or not, if lr==0 we proceed normally, 
 			//if lr==1 then we're going in reverse (starting at the "LAST" node at the opposite end of the array and proceeding backwards).
 			if(lr==0)
 			{
-				printf("%d\n", __LINE__);
-
 				succ=(mementry *)((char *)p + sizeof(mementry) + size);
 				succ->prev=p;
 				succ->succ=p->succ;
 
 				if(p->succ!=NULL)
 				{
-					p->succ->prev=succ;  
-					printf("%d\n", __LINE__);
+					p->succ->prev=succ; 
 				}
 
 				p->succ=succ;
@@ -171,7 +159,6 @@ void *myMalloc(unsigned int size, char * file, int line)
 			{
 				//Since we are going from the other end of the array, SUCC becomes the smaller portion of the splitting, and it holds our input data.
 				//As you might notice, I just reversed a lot of what we have above.
-				printf("%d\n", __LINE__);
 				succ=((mementry *)((char *)p + p->size) - size);
 				succ->prev=p;
 				succ->succ=p->succ;
@@ -185,17 +172,7 @@ void *myMalloc(unsigned int size, char * file, int line)
 				p->isfree=1;
 				p->prev=prev;
 				succ->recognize = recpattern;
-
-				//You'll notice that the actual address of succ is a little weird here.	
-				printf("succ %d, succ->size %d, succ-prev %d, succ-succ %d\n, p %d, p-succ %d\n", succ, succ->size, succ->prev, succ->succ, p, p->succ);
 			}
-
-			//printf("%d p itself\n", p+sizeof(mementry));
-			//printf("%d prev\n", p->prev);
-			//printf("%d root\n", root);
-			//printf("%d root isfree\n", root->isfree);
-			//printf("%d\n __LINE__", p->prev->isfree);
-
 			printf("Memory allocated, new mementry created. Location of mementry is %d\n", p);
 			printf("Size of mementry is actually %d while size requested was %d \n",p->size, size );
 			printf("p has a prev as %d and successor as %d \n",p->prev, p->succ );
@@ -206,7 +183,6 @@ void *myMalloc(unsigned int size, char * file, int line)
 				return (char *)succ + sizeof(mementry);
 
 			return (char*)p + sizeof(mementry);
-			//return p + sizeof(mementry);
 		}
 	}
 
@@ -215,17 +191,14 @@ void *myMalloc(unsigned int size, char * file, int line)
 }
 void myFree(void * p1, char * file, int line)
 {
-	//NOTE: I'M NOT SURE HOW MY FRAGMENTATION APPROACH AFFECTS FREE. I'm assuming it should be fine, though. From free's perspective
-	//everything should be the same, we're stil just passing it one linked list.
-
 	mementry *ptr, *pred, *succ;
-	ptr = (mementry *)p1-1;
-	//ptr = (mementry *)((char*)p1-sizeof(mementry)); 
-	
-	printf("IN FREE\n");
-	printf("ptr %d isfree is %d \n", ptr, ptr->isfree);	
-	printf("ptr %d size %d \n", ptr, ptr->size);	
-	printf("ptr %d recognize %x \n", ptr, ptr->recognize);	
+	ptr = (mementry *)p1-1;	
+
+	// COMMENTED OUT PRINTF FOR DEBUGGING
+	// printf("IN FREE\n");
+	// printf("ptr %d isfree is %d \n", ptr, ptr->isfree);	
+	// printf("ptr %d size %d \n", ptr, ptr->size);	
+	// printf("ptr %d recognize %x \n", ptr, ptr->recognize);	
 	
 	
 	if(ptr->recognize!=recpattern)
@@ -269,18 +242,12 @@ void myFree(void * p1, char * file, int line)
 
 int main()
 {
-
-	//printf("Size of mementry is %d \n", sizeof(mementry));
 	int *arr= (int *)malloc(10*sizeof(int));
-	printf("Malloc for arr gave me the address %d \n",arr);
 	int i = 0;
 	for(i=0; i<10; i++)
 		arr[i]=i+1;
 	printf("Allocated an array of 10 integers to arr.\n");
-	
-
 	char *b= (char *)malloc(10*sizeof(char));
-	printf("Malloc for b gave me the address %d\n", b);
 	int g = 0;
 	for(g=0; g<9; g++)
 		b[g]='r';
@@ -289,23 +256,23 @@ int main()
 
 	printf("in main, after all mallocs:MEMUSED: %d MEMLEFT: %d\n", memused, ((blocksize)-sizeof(mementry))-memused);
 
-	//adding two "large" chunks. 	
+	printf("Adding two LARGE chunks now\n");
 	char *c= (char *)malloc(1000);
 	char *d= (char *)malloc(1000);
 	
-	//Freeing b+10, which wasnt an address by our malloc SHOULD GIVE AN ERROR
+	printf("Freeing b+10, which wasnt an address by our malloc SHOULD GIVE AN ERROR\n");
 	free(b+10);
 	
-	//Freeing b normally, should be successful.
+	printf("Freeing b normally, should be successful.\n");
 	free(b);
 
-	//Freeing b again; SHOULD GIVE AN ERROR
+	printf("Freeing b again; SHOULD GIVE AN ERROR\n");
 	free(b);
 
-	//Trying to free one of our LARGE CHUNKS
+	printf("Trying to free one of our LARGE CHUNKS\n");
 	free(d);
 
-	//TRYING TO FREE SOMETHING NOT ALLOCATED BY MALLOC
+	printf("TRYING TO FREE SOMETHING NOT ALLOCATED BY MALLOC\n");
 	int x;
 	free(&x);
 	
